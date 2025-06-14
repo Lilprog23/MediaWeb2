@@ -1,0 +1,28 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<div class="edit-profile-image-container">
+    <button class="back-btn" onclick="window.location.href='{% url 'profileview' %}'"><i class="fas fa-arrow-left"></i></button>
+    <h1>Cover Picture</h1>
+    <img id="preview" src="{{ user.profile.cover_picture.url }}" alt="Profile Picture">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="cover_picture" id="profilePictureInput" accept="image/*" onchange="previewImage(event)">
+        <button onclick="return confirm('Do you want to change Profile Picture?')"class="upload-submit" type="submit">Update cover</button>
+    </form>
+</div>
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('preview');
+                preview.src = e.target.result; 
+            };
+            reader.readAsDataURL(file); 
+        }
+    }
+</script>
+
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="about-container">
+        <button class="back-btn" onclick="window.location.href='{% url 'profileview' %}'"><i class="fas fa-arrow-left"></i>Back</button>
+        <h1>About Me</h1>
+        <div class="profile-details">
+            <div class="fullname">
+                <div><strong>Full Name:</strong> 
+                    {{ user.f_name }} 
+                    {% if user.m_name %} {{ user.m_name }}{% endif %} 
+                    {{ user.l_name }}
+                </div>
+            </div>
+            <div><strong>Email:</strong> {{ user.email }}</div>
+            <div><strong>Bio:</strong> {{ profile.bio }}</div>
+            <div><strong>Birthday:</strong> {{ profile.b_day }}</div>
+            <div><strong>Phone Number:</strong> {{ profile.phone_number }}</div>
+            <div><strong>Address:</strong> {{ profile.address }}</div>
+            <div><strong>Gender:</strong> {{ profile.gender }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

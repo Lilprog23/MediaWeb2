@@ -1,0 +1,26 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<div class="following-list-container">
+    <h1>Followers</h1>
+    <div class="following-list">
+        {% for follower in followers %}
+        <div class="following-item">
+            <img src="{{ follower.user.profile.profile_picture.url }}" alt="Follower Picture">
+            <p>{{ follower.user.f_name }}</p>
+            {% if follower.user.m_name %}
+            <p>{{ follower.user.m_name }}</p>
+            {% endif %}
+            <p>{{ follower.user.l_name }}</p>
+
+
+
+
+            <button class="accept-button"
+                onclick="window.location.href='{% url 'accept_friend_request' user_id=follower.user.id %}'">Accept
+                request</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
