@@ -1,0 +1,426 @@
+{% extends 'main/home.html' %}
+
+
+{% block content %}
+
+<style>
+    .profile {
+        width: 100%;
+        height: auto;
+        margin-top: 100px;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .user-profile {
+        background-color: #ffffff;
+        width: 100%;
+        height: 480px;
+        box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+        display: flex;
+        border-radius: 10px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .user-profile .profile-cover {
+        width: 100%;
+        height: 300px;
+        border-radius: 10px;
+    }
+
+    .user-profile .user-profile {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin-top: -60px;
+        margin-left: -1000px;
+        border: 5px solid white;
+
+    }
+
+    .profile-complete-name p {
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .profile-complete-name p:nth-child(2) {
+        font-size: 0.9rem;
+        color: #0051ff;
+    }
+
+    .profile-complete-name p:nth-child(1) {
+        font-size: 30px;
+        color: #000000;
+        font-weight: bold;
+    }
+
+    .profile-complete-name {
+        position: relative;
+        top: -140px;
+        left: -280px;
+    }
+
+    .profile-actions-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        top: -100px;
+        left: 600px;
+
+    }
+
+    .action-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .ellipsis-btn {
+        position: relative;
+    }
+
+    .custom-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 40px;
+        background-color: rgb(4, 0, 252);
+        min-width: 180px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        border: 1px solid #007bff;
+        border-radius: 6px;
+    }
+
+    .dropdown-content a {
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        font-weight: 500;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .about-user {
+        width: 400px;
+        height: auto;
+        background-color: #ffffff;
+        box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+        border-radius: 10px;
+        margin-top: 10px;
+        padding: 20px;
+        position: absolute;
+    }
+
+    .about-user p {
+        color: #555555;
+    }
+
+    .user-post {
+        width: 68.5%;
+        height: auto;
+        background-color: #ffffff;
+        box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+        border-radius: 10px;
+        margin-top: 10px;
+        padding: 20px;
+        position: relative;
+        left: 410px;
+    }
+
+    .post-classification {
+        display: flex;
+        justify-content: space-around;
+        background-color: #f0f8ff;
+
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background-color: #797979;
+        color: #ffffff;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid #000000;
+    }
+
+    .tab-btn:hover,
+    .tab-btn.active {
+        background-color: #ffffff;
+        color: rgb(0, 0, 0);
+    }
+
+    .tab-content {
+        display: none;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 8px;
+        margin-top: 10px;
+        border-bottom: 1px solid #000000;
+    }
+
+    .tab-content.active-tab {
+        display: block;
+    }
+
+    .post-header img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        object-fit: cover;
+        border: 2px solid #007bff;
+    }
+
+    .post-user-info span {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .post-user-info .post-time {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .delete-post {
+        margin-left: auto;
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+    .delete-post i {
+        font-size: 16px;
+    }
+
+    .post-content {
+        margin-top: 10px;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+    }
+
+    .post-content p {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .post-content img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #007bff33;
+    }
+
+    .post-content video {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #007bff33;
+    }
+
+    .post-actions {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #ff4b5c;
+        font-weight: bold;
+    }
+
+    .photo-thumb {
+        width: 100px;
+        height: 100px;
+        margin: 5px;
+        border-radius: 6px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .photo-thumb:hover {
+        transform: scale(1.05);
+    }
+
+    .photo-modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .photo-modal-content {
+        display: block;
+        margin: 5% auto;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 10px;
+    }
+
+    .photo-modal-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+
+<div class="profile">
+    <div class="user-profile">
+        <img class="profile-cover" src="{{ user.profile.cover_picture.url }}" alt="Profile Picture">
+        <img class="user-profile" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+        <div class="profile-complete-name">
+            <p>
+                {{ user.f_name }}
+                {% if user.m_name %} {{ user.m_name }} {% endif %}
+                {{ user.l_name }}
+            </p>
+            <p>@_{{ user.username }}</p>
+        </div>
+        <div class="profile-actions-btn">
+            <div class="custom-dropdown">
+                <button class="action-btn ellipsis-btn" onclick="toggleDropdown()">
+                    <i class="fa-solid fa-ellipsis-vertical" style="color: #ffffff;"></i>
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-content">
+                    <a href="">Edit Profile</a>
+                    <a href="">Update Profile Picture</a>
+                    <a href="">Update Cover Photo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="about-user">
+        <strong>ABOUT</strong>
+        <hr>
+        <strong>Bio:</strong>
+        <p>{{ user.profile.bio }}</p>
+        <strong>Phone No.</strong>
+        <p>{{ user.profile.phone_number }}</p>
+        <strong>Address:</strong>
+        <p>{{ user.profile.address }}</p>
+    </aside>
+
+    <article class="user-post">
+        <div class="post-classification">
+            <button class="tab-btn active" onclick="showTab('posts')">Posts</button>
+            <button class="tab-btn" onclick="showTab('photos')">Photos</button>
+            <button class="tab-btn" onclick="showTab('videos')">Videos</button>
+        </div>
+        {% for post in posts %}
+        <div id="posts" class="tab-content active-tab">
+            <div class="post-header">
+                <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile Picture"
+                    onclick="window.location.href='{% url 'view_profile' post.user.id %}'">
+
+                <div class="post-user-info">
+                    <span>{{ post.user.f_name }} {{ post.user.l_name }}</span>
+                    <p class="post-time">{{ post.time_since_posted }}</p>
+                </div>
+
+                {% if user == post.user %}
+                <a href="{% url 'delete_post' post.id %}" class="delete-post">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="post-content">
+                <p>{{ post.content }}</p>
+                {% if post.image %}
+                <img src="{{ post.image.url }}" alt="Post Image">
+                {% endif %}
+                {% if post.video %}
+                <video src="{{ post.video.url }}" controls></video>
+                {% endif %}
+            </div>
+
+            {% endfor %}
+    </article>
+    <div id="photoModal" class="photo-modal">
+        <span class="photo-modal-close" onclick="closePhotoModal()">&times;</span>
+        <img class="photo-modal-content" id="enlargedPhoto">
+    </div>
+
+
+    <h4>Comments:</h4>
+    {% for comment in post_comments %}
+    <div class="comment">
+        <strong>{{ comment.user.username }}:</strong> {{ comment.text }}
+    </div>
+    {% empty %}
+    <p>No comments yet.</p>
+    {% endfor %}
+
+</div>
+
+
+
+
+<script>
+    function enlargePhoto(src) {
+        const modal = document.getElementById("photoModal");
+        const img = document.getElementById("enlargedPhoto");
+        modal.style.display = "block";
+        img.src = src;
+    }
+
+    function closePhotoModal() {
+        document.getElementById("photoModal").style.display = "none";
+    }
+
+    function toggleDropdown() {
+        const dropdown = document.getElementById("dropdownMenu");
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+
+        // Close dropdown if clicked outside
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest(".custom-dropdown")) {
+                dropdown.style.display = "none";
+            }
+        }, { once: true });
+    }
+</script>
+<script>
+    function showTab(tabId) {
+        const tabs = document.querySelectorAll('.tab-content');
+        const buttons = document.querySelectorAll('.tab-btn');
+
+        tabs.forEach(tab => tab.classList.remove('active-tab'));
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active-tab');
+        event.target.classList.add('active');
+    }
+</script>
+
+
+
+{% endblock %}

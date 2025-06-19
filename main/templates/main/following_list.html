@@ -1,0 +1,20 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<div class="following-list-container">
+    <h1>Following</h1>
+    {% for following in followings %}
+    <div class="following-list">
+
+        <div class="following-item">
+            <img onclick="window.location.href='{% url 'view_profile' following.following.id %}'"
+                src="{{ following.following.profile.profile_picture.url }}" alt="Following Picture">
+            <p>{{ following.following.f_name }} </p>
+            <p>{{ following.following.l_name }}</p>
+
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

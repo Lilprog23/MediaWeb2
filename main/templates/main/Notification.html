@@ -1,0 +1,73 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<div class="notification-container">
+    <h2>Your Notifications</h2>
+    {% if notifications %}
+    <ul class="notification-list">
+        {% for notification in notifications %}
+        <li class="{% if not notification.is_read %}unread{% else %}read{% endif %}">
+            <p>{{ notification.message }}</p>
+            <small>{{ notification.created_at}}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No notifications available.</p>
+    {% endif %}
+</div>
+
+
+
+<style>
+    .notification-container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 100px auto 0;
+    }
+
+    .notification-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .notification-list li {
+        background-color: #f9f9f9;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border-left: 5px solid #ccc;
+    }
+
+    .notification-list li.unread {
+        background-color: #fffbe6;
+        border-left-color: orange;
+        font-weight: bold;
+    }
+
+    .notification-list li.read {
+        color: #000000;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleChatBtn = document.getElementById('toggle-chat');
+        const chatSidebar = document.getElementById('Chat-sidebar');
+        const closeChatBtn = document.getElementById('close-chat-sidebar');
+
+        if (toggleChatBtn && chatSidebar) {
+            toggleChatBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                chatSidebar.classList.toggle('open');
+            });
+        }
+
+        if (closeChatBtn && chatSidebar) {
+            closeChatBtn.addEventListener('click', function () {
+                chatSidebar.classList.remove('open');
+            });
+        }
+    });
+</script>
+
+{% endblock %}

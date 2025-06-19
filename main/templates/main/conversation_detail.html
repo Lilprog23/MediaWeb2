@@ -1,0 +1,216 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-box">
+        <div class="chat-header">
+            <a href="#" class="back-button" id="chat-back"><i class="fas fa-arrow-left"></i></a>
+            {% if conversation.sender.id == request.session.user_id %}
+            <img class="avatar" src="{{ conversation.recipient.profile.profile_picture.url }}" alt="Avatar">
+            <h1 class="conversation-title">{{ conversation.recipient.f_name }} {{ conversation.recipient.l_name }}</h1>
+            {% else %}
+            <img class="avatar" src="{{ conversation.sender.profile.profile_picture.url }}" alt="Avatar">
+            <h1 class="conversation-title">{{ conversation.sender.f_name }} {{ conversation.sender.l_name }}</h1>
+            {% endif %}
+        </div>
+
+        <div class="chat-messages">
+            {% for message in messages %}
+            <div class="message {% if message.user.id == request.session.user_id %}sent{% else %}received{% endif %}">
+                <div class="message-bubble">
+                    {% if message.user.id != request.session.user_id %}
+                    <img class="avatar" src="{{ message.user.profile.profile_picture.url }}" alt="Avatar">
+                    {% endif %}
+                    <div class="message-text">
+                        <p class="message-user">{{ message.user.f_name }} {{ message.user.l_name }}</p>
+                        <p class="message-content">{{ message.message }}</p>
+                        <span class="timestamp">{{ message.timestamp }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="message-form-container">
+            <form method="post" class="message-form">
+                {% csrf_token %}
+                <textarea name="message" placeholder="Type a message..." required></textarea>
+                <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .chat-container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 100px auto 0;
+    }
+
+    .chat-box {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: rgb(255, 255, 255);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        height: 80vh;
+    }
+
+    .chat-header {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border-bottom: 1px solid #ddd;
+        background-color: #007bff;
+        color: white;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .chat-header .back-button {
+        margin-right: 10px;
+        font-size: 1.5em;
+        color: white;
+        text-decoration: none;
+    }
+
+    .chat-header .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .conversation-title {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .message {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .message.sent {
+        justify-content: flex-end;
+    }
+
+    .message-bubble {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 15px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        max-width: 70%;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .message.sent .message-bubble {
+        background-color: #2f67a3;
+        color: white;
+    }
+
+    .message.received .message-bubble {
+        background-color: #e9ecef;
+        color: black;
+    }
+
+    .message-bubble .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+    }
+
+    .message-text {
+        flex: 1;
+    }
+
+    .message-user {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .message-content {
+        word-wrap: break-word;
+    }
+
+    .timestamp {
+        display: block;
+        font-size: 0.8em;
+        color: #000;
+        margin-top: 5px;
+        text-align: right;
+    }
+
+    /* Message Input */
+    .message-form-container {
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        background-color: #007bff;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .message-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .message-form textarea {
+        flex: 1;
+        padding: 10px;
+        border-radius: 20px;
+        border: 1px solid #b6b6b6;
+        resize: none;
+        font-size: 1em;
+        background-color: #dfdfdf;
+    }
+
+    .message-form button {
+        padding: 10px 20px;
+        background-color: rgb(4, 0, 255);
+        color: #ffffff;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+
+    .message-form button:hover {
+        background-color: #73e3ff;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background-color: #f0f2f5;
+    }
+</style>
+
+<script>
+    document.getElementById('chat-back').addEventListener('click', function (e) {
+        e.preventDefault();
+        history.back();
+    });
+</script>
+{% endblock %}

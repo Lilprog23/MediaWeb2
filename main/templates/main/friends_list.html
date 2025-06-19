@@ -1,0 +1,77 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<style>
+    .Friend-List {
+        background-color: #fff;
+        padding: 20px;
+        max-width: 400px;
+        margin: 30px auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .Friend-List h3 {
+        font-size: 22px;
+        margin-bottom: 20px;
+        color: #333;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .friend-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .friend-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+
+    .friend-item:hover {
+        background-color: #e6f7ff;
+    }
+
+    .friend-item img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 12px;
+    }
+
+    .friend-item span {
+        font-size: 16px;
+        color: #333;
+    }
+
+    .no-friends {
+        font-style: italic;
+        color: #777;
+    }
+</style>
+
+<div class="Friend-List">
+    <h3>Friends</h3>
+    {% if friends %}
+    <div class="friend-items">
+        {% for friend in friends %}
+        <div class="friend-item">
+            {% if friend.profile.profile_picture %}
+            <img src="{{ friend.profile.profile_picture.url }}" alt="Profile">
+            {% endif %}
+            <span>{{ friend.f_name }} {{ friend.l_name }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-friends">You have no friends yet.</p>
+    {% endif %}
+</div>
+{% endblock content %}

@@ -1,0 +1,495 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatterly</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="/"><img src="../../static/chat.png" alt="Profile Picture"></a>
+
+
+        </div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="{% url 'profileview' %}"><i class="fa-regular fa-circle-user"></i></a></li>
+                <li><a href="" id="toggle-friends"><i class="fa-regular fa-user"></i></a></li>
+                <li class="nav-item position-relative">
+                    <a href="#" class="nav-link" id="toggle-chat">
+                        <i class="fa-regular fa-comment fa-lg"></i>
+                    </a>
+                </li>
+
+
+                <li class="nav-item position-relative">
+                    <a href="{% url 'notifications' %}" class="nav-link">
+                        <i class="fa-regular fa-bell fa-lg"></i>
+                    </a>
+                </li>
+            </ul>
+
+        </nav>
+        <button class="logout-btn" onclick="window.location.href='{% url 'logout' %}'">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+    </header>
+
+    {% block content %}
+    <div class="feed-container">
+        <div class="upload-post">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"
+                        onclick="window.location.href='{% url 'profileview' %}'">
+                    {% endif %}
+                    <textarea id="contentTextarea" name="content" rows="5" class="form-control textarea-with-img"
+                        placeholder="Write something here..."></textarea>
+                </div>
+
+                <div class="upload-boxes">
+                    <div class="upload-box">
+                        <label for="imageUpload"><i class="fa-solid fa-image"></i> Image</label>
+                        <input type="file" id="imageUpload" accept="image/*" name="image">
+                    </div>
+
+                    <div class="upload-box">
+                        <label for="videoUpload"><i class="fa-solid fa-video"></i> Video</label>
+                        <input type="file" id="videoUpload" accept="video/*" name="video">
+                    </div>
+                </div>
+
+                <button type="submit" class="upload-submit">Upload</button>
+            </form>
+        </div>
+
+
+        {% for post in posts %}
+        <article class="feed">
+
+            <div class="post-header">
+                <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile Picture" class="post-image"
+                    onclick="window.location.href='{% url 'view_profile' post.user.id %}'">
+
+                <div class="post-user-info" onclick="window.location.href='{% url 'view_profile' post.user.id %}'">
+                    <span>{{ post.user.f_name }} {{ post.user.l_name }}</span>
+                    <p class="post-time">{{ post.time_since_posted }}</p>
+                </div>
+
+                {% if user == post.user %}
+                <div class="post-actions-right">
+
+                    <a href="javascript:void(0);" onclick="openEditModal({{ post.id }}, '{{ post.content|escapejs }}')"
+                        class="edit-post">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+
+
+                    <a href="{% url 'delete_post' post.id %}" class="delete-post">
+                        <i class="fa-solid fa-trash" title="Delete Post"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div id="editModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Post</h3>
+                    <form id="editPostForm">
+                        {% csrf_token %}
+                        <textarea id="editPostContent" name="content" rows="4"></textarea>
+                        <input type="hidden" id="editPostId">
+                        <button type="submit"><i class="fas fa-check"></i></button>
+                    </form>
+                    <button onclick="closeEditModal()">Close</button>
+                </div>
+            </div>
+
+
+            <div class="post-content">
+                <p id="post-content-{{ post.id }}">{{ post.content }}</p>
+                {% if post.image %}
+                <img class="postimage" src="{{ post.image.url }}" alt="Post Image">
+                {% endif %}
+                {% if post.video %}
+                <video src="{{ post.video.url }}" controls></video>
+                {% endif %}
+            </div>
+            <div class="post-actions">
+                <p id="like-count-{{ post.id }}">❤️<span> </span> {{ post.no_of_likes }}</p>
+
+                <div>
+                    <button onclick="likePost({{ post.id }})" class="action-btn" id="like-btn-{{ post.id }}">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button class="action-btn" onclick="window.location.href='{% url 'comment' post.id %}'">
+                        <i class="fas fa-comment"></i>
+                    </button>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <aside class="right-sidebar">
+        {% if sent_friend_requests %}
+        <h3>Friend Requests:</h3>
+        <ul class="friend-request-list">
+            {% for request in sent_friend_requests %}
+            <li class="friend-request-item">
+                <div class="request-header">
+                    <img src="{{ request.sender.profile.profile_picture.url }}" alt="Profile Picture"
+                        class="profile-picture"
+                        onclick="window.location.href='{% url 'view_profile' request.sender.id %}'">
+                    <div>
+                        <strong>{{ request.sender.f_name }} {{ request.sender.l_name }}</strong><br>
+                        <small>has sent you a friend request</small>
+                    </div>
+                </div>
+                <div class="mutual-friends">
+                    <span>Mutual friends:</span>
+                    <ul>
+                        {% for friend in request.sender.friends.all %}
+                        {% if friend in user.friends.all %}
+                        <li>{{ friend.username }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div id="actions-{{ request.id }}">
+                        <button type="button" class="accept-btn"
+                            onclick="handleFriendAction({{ request.id }}, 'accept')">Accept</button>
+                        <button type="button" class="reject-btn"
+                            onclick="handleFriendAction({{ request.id }}, 'reject')">Reject</button>
+                    </div>
+                    <div id="message-{{ request.id }}" class="message-area mt-2"></div>
+                </form>
+
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No friend requests yet.</p>
+        {% endif %}
+    </aside>
+
+
+
+    <aside class="left-buttom-sidebar">
+        <div class="friend-status accepted">
+            <h5>✅ Accepted Requests</h5>
+            {% if accepted_requests %}
+            <ul>
+                {% for request in accepted_requests %}
+                <li>
+                    <img src="{{ request.accepted_friend.profile.profile_picture.url }}" alt="Profile" width="30">
+                    {{ request.accepted_friend.f_name }} {{ request.accepted_friend.l_name }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No accepted requests.</p>
+            {% endif %}
+        </div>
+    </aside>
+
+
+
+    <div id="Chat-sidebar" class="chat-sidebar">
+        <h3>Chat</h3>
+        <div class="chat-container">
+            {% for conversation in conversations %}
+            <div class="conversation-item">
+                {% if conversation.sender.id == request.session.user_id %}
+                <img src="{{ conversation.recipient.profile.profile_picture.url }}" alt="Avatar">
+                {% else %}
+                <img src="{{ conversation.sender.profile.profile_picture.url }}" alt="Avatar">
+                {% endif %}
+                <a href="{% url 'conversation-detail' conversation.id %}">
+                    {% if conversation.sender.id == request.session.user_id %}
+                    {{ conversation.recipient.f_name }} {{ conversation.recipient.l_name }}
+
+                    {% else %}
+                    {{ conversation.sender.f_name }} {{ conversation.sender.l_name }}
+                    {% endif %}
+                </a>
+                <!-- add a button to delete the conversation -->
+                <button class="delete-conversation-btn"
+                    onclick="window.location.href='{% url 'delete_conversation' conversation.id %}'">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+            {% empty %}
+            <div class="conversation-item">No conversations yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="friends-sidebar" class="friends-sidebar">
+        <h3>Friends</h3>
+        {% if accepted_requests %}
+        <div class="friend-items">
+            {% for friend in accepted_requests %}
+            <div class="friend-item">
+                <img src="{{ friend.accepted_friend.profile.profile_picture.url }}" alt="Profile Picture"
+                    onclick="window.location.href='{% url 'view_profile' friend.accepted_friend.id %}'">
+                <span>{{ friend.accepted_friend.f_name }} {{ friend.accepted_friend.l_name }}</span>
+                <button class="chat-btn"
+                    onclick="window.location.href='{% url 'send_message' friend.accepted_friend.id %}'">
+                    <i class="fa-regular fa-message"></i>
+                </button>
+
+
+
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="no-friends">No friends yet.</p>
+        {% endif %}
+    </div>
+
+
+
+
+
+
+
+
+
+    {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        document.querySelector('.notification-dot').classList.remove('d-none');
+    </script>
+
+    <script>
+        document.getElementById('toggle-friends').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('friends-sidebar').classList.toggle('open');
+        });
+
+        document.getElementById('close-sidebar').addEventListener('click', function () {
+            document.getElementById('friends-sidebar').classList.remove('open');
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const likeBtns = document.querySelectorAll('[id^="like-btn-"]');
+
+            likeBtns.forEach(likeBtn => {
+                const postId = likeBtn.id.split('-')[2];
+                const liked = likeBtn.getAttribute('data-liked') === 'true';
+                const icon = likeBtn.querySelector('i');
+
+                icon.style.color = liked ? 'red' : 'gray';
+            });
+        });
+
+        function likePost(postId) {
+            fetch(`/like/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById(`like-count-${postId}`).innerText = `❤️ ${data.likes}`;
+                    const icon = document.querySelector(`#like-btn-${postId} i`);
+                    icon.style.color = data.liked ? 'red' : 'gray'; // Toggle color
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+
+
+
+
+    </script>
+    <script>
+        function handleFriendAction(requestId, action) {
+            const url = action === 'accept'
+                ? `/accept_friend_request/${requestId}/`
+                : `/reject_friend_request/${requestId}/`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById(`actions-${requestId}`).style.display = 'none';
+                    const msgDiv = document.getElementById(`message-${requestId}`);
+                    msgDiv.textContent = data.message || "Action completed.";
+                    msgDiv.classList.add('text-success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const msgDiv = document.getElementById(`message-${requestId}`);
+                    msgDiv.textContent = 'Something went wrong. Please try again.';
+                    msgDiv.classList.add('text-danger');
+                });
+        }
+
+        function getCSRFToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                if (cookie.trim().startsWith('csrftoken=')) {
+                    return cookie.trim().split('=')[1];
+                }
+            }
+            return '';
+        }
+    </script>
+
+    <script>
+        function openEditModal(postId, content) {
+            document.getElementById('editPostId').value = postId;
+            document.getElementById('editPostContent').value = content;
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        document.getElementById('editPostForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const postId = document.getElementById('editPostId').value;
+            const content = document.getElementById('editPostContent').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`/edit-post-ajax/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: content })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`post-content-${postId}`).textContent = content;
+                        closeEditModal();
+                    } else {
+                        alert('Failed to update post.');
+                    }
+                });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.postimage').forEach(image => {
+                image.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+
+                    const modal = document.createElement('div');
+                    modal.className = 'image-modal';
+                    modal.innerHTML = `
+                        <span class="close">&times;</span>
+                        <img src="${this.src}" alt="Zoomed Image">
+                    `;
+                    document.body.appendChild(modal);
+
+                    modal.querySelector('.close').addEventListener('click', function () {
+                        document.body.removeChild(modal);
+                    });
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.getElementById('toggle-chat').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('Chat-sidebar').classList.toggle('open');
+        });
+
+        document.getElementById('close-chat-sidebar').addEventListener('click', function () {
+            document.getElementById('Chat-sidebar').classList.remove('open');
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

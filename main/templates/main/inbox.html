@@ -1,0 +1,86 @@
+{% extends 'main/home.html' %}
+
+{% block content %}
+<style>
+    .conversation-list {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        max-width: 650px;
+        margin: 2rem auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .conversation-item {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+        transition: background-color 0.3s;
+    }
+
+    .conversation-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    .conversation-item img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 1rem;
+        border: 2px solid #ddd;
+    }
+
+    .conversation-item a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .conversation-item small {
+        margin-left: auto;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .conversation-item a:hover {
+        color: #007bff;
+        /* Adjust this to match your color scheme */
+    }
+
+    .conversation-item:nth-child(odd) {
+        background-color: #fefefe;
+    }
+</style>
+
+
+<div class="conversation-list">
+    <h2 style="text-align: center">Conversations</h2>
+    {% for conversation in conversations %}
+    <div class="conversation-item">
+        {% if conversation.sender.id == request.session.user_id %}
+        <img src="{{ conversation.recipient.profile.profile_picture.url }}" alt="Avatar">
+        {% else %}
+        <img src="{{ conversation.sender.profile.profile_picture.url }}" alt="Avatar">
+        {% endif %}
+        <a href="{% url 'conversation-detail' conversation.id %}">
+            {% if conversation.sender.id == request.session.user_id %}
+            {{ conversation.recipient.f_name }} {{ conversation.recipient.l_name }}
+
+            {% else %}
+            {{ conversation.sender.f_name }} {{ conversation.sender.l_name }}
+
+            {% endif %}
+        </a>
+        <small>Last updated: {{ conversation.timestamp }}</small>
+    </div>
+    {% empty %}
+    <div class="conversation-item">No conversations yet.</div>
+    {% endfor %}
+</div>
+
+{% endblock %}
